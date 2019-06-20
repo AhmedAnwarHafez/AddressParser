@@ -10,7 +10,6 @@ import Prelude (class Show, Unit, bind, discard, map, pure, void, ($), (<$>), (<
 import Text.Parsing.StringParser (Parser, try)
 import Text.Parsing.StringParser.CodeUnits (char, oneOf, satisfy)
 import Text.Parsing.StringParser.Combinators (many, many1)
-import Prelude
 
 type Flat = String
 type Line1 = String
@@ -121,15 +120,5 @@ addressParserA4 = do
         (trim l4)
         p 
 
-
-addressParser :: Parser Address
-addressParser = try addressParserA2 <|> try addressParserA3 <|> try addressParserA4
-
-i4 :: String
-i4 = "123 line, line, line, line 1234"
-
-i3 :: String
-i3 = "123 line, line, line 1234"
-
-i2 :: String
-i2 = "123 line, line  1234"
+residentialParser :: Parser Address
+residentialParser = try addressParserA2 <|> try addressParserA3 <|> try addressParserA4
