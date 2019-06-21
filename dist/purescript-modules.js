@@ -15549,10 +15549,10 @@ var PS = {};
   var toString = function (dictFunctor) {
       return function (dictFoldable) {
           return Data_Functor.map(dictFunctor)((function () {
-              var $33 = Data_String_Yarn.fromChars(Data_Foldable.foldableArray);
-              var $34 = Data_Array.fromFoldable(dictFoldable);
-              return function ($35) {
-                  return $33($34($35));
+              var $57 = Data_String_Yarn.fromChars(Data_Foldable.foldableArray);
+              var $58 = Data_Array.fromFoldable(dictFoldable);
+              return function ($59) {
+                  return $57($58($59));
               };
           })());
       };
@@ -15571,7 +15571,7 @@ var PS = {};
   var addressLine = Data_Functor.map(Data_Functor.functorFn)(toString(Text_Parsing_StringParser.functorParser)(Data_List_Types.foldableNonEmptyList))(Text_Parsing_StringParser_Combinators.many1)(Text_Parsing_StringParser_CodeUnits.satisfy(function (c) {
       return Data_Char_Unicode.isLetter(c) || c === " ";
   }));
-  var addressParserA2 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Text_Parsing_StringParser["try"](word))(Text_Parsing_StringParser["try"](poBox)))(function (v) {
+  var addressParserA2 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(word)(function (v) {
       return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
           return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
@@ -15595,7 +15595,7 @@ var PS = {};
           });
       });
   });
-  var addressParserA3 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Text_Parsing_StringParser["try"](word))(Text_Parsing_StringParser["try"](poBox)))(function (v) {
+  var addressParserA3 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(word)(function (v) {
       return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
           return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
@@ -15625,7 +15625,7 @@ var PS = {};
           });
       });
   });
-  var addressParserA4 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Text_Parsing_StringParser["try"](word))(Text_Parsing_StringParser["try"](poBox)))(function (v) {
+  var addressParserA4 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(word)(function (v) {
       return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
           return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
@@ -15661,7 +15661,85 @@ var PS = {};
           });
       });
   });
-  var residentialParser = Control_Alt.alt(Text_Parsing_StringParser.altParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Text_Parsing_StringParser["try"](addressParserA2))(Text_Parsing_StringParser["try"](addressParserA3)))(Text_Parsing_StringParser["try"](addressParserA4));
+  var addressPostalParserA2 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(poBox)(function (v) {
+      return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+              return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                      return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(postcode)(function (v2) {
+                          return Control_Applicative.pure(Text_Parsing_StringParser.applicativeParser)({
+                              flatStreet: "",
+                              line1: v,
+                              line2: "",
+                              line3: "",
+                              line4: Data_String_Common.trim(v1),
+                              postcode: v2
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  });
+  var addressPostalParserA3 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(poBox)(function (v) {
+      return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+              return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                          return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v2) {
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                                  return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(postcode)(function (v3) {
+                                      return Control_Applicative.pure(Text_Parsing_StringParser.applicativeParser)({
+                                          flatStreet: "",
+                                          line1: v,
+                                          line2: v1,
+                                          line3: "",
+                                          line4: Data_String_Common.trim(v2),
+                                          postcode: v3
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  });
+  var addressPostalParserA4 = Control_Bind.bind(Text_Parsing_StringParser.bindParser)(poBox)(function (v) {
+      return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+              return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v1) {
+                  return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                          return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v2) {
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipComma)(function () {
+                                  return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                                      return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(addressLine)(function (v3) {
+                                          return Control_Bind.discard(Control_Bind.discardUnit)(Text_Parsing_StringParser.bindParser)(skipWhitespaces)(function () {
+                                              return Control_Bind.bind(Text_Parsing_StringParser.bindParser)(postcode)(function (v4) {
+                                                  return Control_Applicative.pure(Text_Parsing_StringParser.applicativeParser)({
+                                                      flatStreet: "",
+                                                      line1: v,
+                                                      line2: v1,
+                                                      line3: v2,
+                                                      line4: Data_String_Common.trim(v3),
+                                                      postcode: v4
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  });
+  var residentialParser = Control_Alt.alt(Text_Parsing_StringParser.altParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Control_Alt.alt(Text_Parsing_StringParser.altParser)(Text_Parsing_StringParser["try"](addressParserA2))(Text_Parsing_StringParser["try"](addressParserA3)))(Text_Parsing_StringParser["try"](addressParserA4)))(Text_Parsing_StringParser["try"](addressPostalParserA2)))(Text_Parsing_StringParser["try"](addressPostalParserA3)))(Text_Parsing_StringParser["try"](addressPostalParserA4));
   var get = function (input) {
       var result = Text_Parsing_StringParser.runParser(residentialParser)(input);
       var id = function (x) {
@@ -15680,6 +15758,20 @@ var PS = {};
       })(id)(result);
       return output;
   };
+  exports["toString"] = toString;
+  exports["word"] = word;
+  exports["addressLine"] = addressLine;
+  exports["poBox"] = poBox;
+  exports["postcode"] = postcode;
+  exports["skipWhitespaces"] = skipWhitespaces;
+  exports["skipComma"] = skipComma;
+  exports["addressParserA2"] = addressParserA2;
+  exports["addressParserA3"] = addressParserA3;
+  exports["addressParserA4"] = addressParserA4;
+  exports["addressPostalParserA2"] = addressPostalParserA2;
+  exports["addressPostalParserA3"] = addressPostalParserA3;
+  exports["addressPostalParserA4"] = addressPostalParserA4;
+  exports["residentialParser"] = residentialParser;
   exports["get"] = get;
 })(PS);
 (function($PS) {
@@ -19325,7 +19417,6 @@ var PS = {};
   exports["timeout"] = timeout;
 })(PS);
 (function($PS) {
-  // Generated by purs version 0.13.0
   "use strict";
   $PS["Main"] = $PS["Main"] || {};
   var exports = $PS["Main"];
@@ -19340,7 +19431,7 @@ var PS = {};
   var Test_Spec_Assertions = $PS["Test.Spec.Assertions"];
   var Test_Spec_Reporter_Console = $PS["Test.Spec.Reporter.Console"];
   var Test_Spec_Runner = $PS["Test.Spec.Runner"];                
-  var main = Test_Spec_Runner.run([ Test_Spec_Reporter_Console.consoleReporter ])(Test_Spec.describe("Address Parser")(Test_Spec.describe("Valid Address Formats")(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("Parse \"123 street, city 1234\"")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+  var main = Test_Spec_Runner.run([ Test_Spec_Reporter_Console.consoleReporter ])(Test_Spec.describe("Address Parser")(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.describe("Residential addresses tests")(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("with 2 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
       return "flatStreet";
   }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
       return "line1";
@@ -19372,7 +19463,7 @@ var PS = {};
       line4: "city",
       postcode: "1234"
   })))(function () {
-      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("Parse \"123/A Long Street, Wide City 1234\"")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("with 3 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
           return "flatStreet";
       }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
           return "line1";
@@ -19404,7 +19495,7 @@ var PS = {};
           line4: "Wide City",
           postcode: "1234"
       })))(function () {
-          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("Parse \"123/A Long Street, Fanatasy Suburb, Wide City 1234\"")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("with 4 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
               return "flatStreet";
           }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
               return "line1";
@@ -19436,7 +19527,7 @@ var PS = {};
               line4: "Wide City",
               postcode: "1234"
           })))(function () {
-              return Test_Spec.it("Parse \"12/3A Long Street, Fantasy Suburb, Area, Wide City 1234\"")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return Test_Spec.it("with 4 lines and sepecial characters in flatStreet")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
                   return "flatStreet";
               }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
                   return "line1";
@@ -19470,7 +19561,105 @@ var PS = {};
               }));
           });
       });
-  }))));
+  })))(function () {
+      return Test_Spec.describe("Postal addresses tests")(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("with 2 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "flatStreet";
+      }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "line1";
+      }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "line2";
+      }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "line3";
+      }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "line4";
+      }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+          return "postcode";
+      }))(Data_Show.showRecordFieldsNil)(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)))(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+          return "postcode";
+      }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+          return "line4";
+      }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+          return "line3";
+      }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+          return "line2";
+      }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+          return "line1";
+      }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+          return "flatStreet";
+      }))(Data_Eq.eqString)))(AddressParser.get("Private Bag 111, Kaikohe 4444"))({
+          flatStreet: "",
+          line1: "Private Bag 111",
+          line2: "",
+          line3: "",
+          line4: "Kaikohe",
+          postcode: "4444"
+      })))(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Test_Spec.it("with 3 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "flatStreet";
+          }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "line1";
+          }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "line2";
+          }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "line3";
+          }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "line4";
+          }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+              return "postcode";
+          }))(Data_Show.showRecordFieldsNil)(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)))(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+              return "postcode";
+          }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+              return "line4";
+          }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+              return "line3";
+          }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+              return "line2";
+          }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+              return "line1";
+          }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+              return "flatStreet";
+          }))(Data_Eq.eqString)))(AddressParser.get("PO Box 111, Mail Centre, Hamilton 3240"))({
+              flatStreet: "",
+              line1: "PO Box 111",
+              line2: "Mail Centre",
+              line3: "",
+              line4: "Hamilton",
+              postcode: "3240"
+          })))(function () {
+              return Test_Spec.it("with 4 lines")(Test_Spec_Assertions.shouldEqual(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "flatStreet";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "line1";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "line2";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "line3";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "line4";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "postcode";
+              }))(Data_Show.showRecordFieldsNil)(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString))(Data_Show.showString)))(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                  return "postcode";
+              }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+                  return "line4";
+              }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+                  return "line3";
+              }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+                  return "line2";
+              }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+                  return "line1";
+              }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
+                  return "flatStreet";
+              }))(Data_Eq.eqString)))(AddressParser.get("Private Bag 333, Suburb, Mail Center, Kaikohe 0440"))({
+                  flatStreet: "",
+                  line1: "Private Bag 333",
+                  line2: "Suburb",
+                  line3: "Mail Center",
+                  line4: "Kaikohe",
+                  postcode: "0440"
+              }));
+          });
+      }));
+  })));
   exports["main"] = main;
 })(PS);
-PS["Main"].main();
