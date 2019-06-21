@@ -1,13 +1,16 @@
 module AddressParser where
 
+import Prelude
+
 import Control.Alt ((<|>))
 import Data.Array (fromFoldable) as A
 import Data.Char.Unicode (isDigit, isLetter)
+import Data.Either (either)
+import Data.Foldable (class Foldable)
 import Data.List (List)
 import Data.String.Common (trim)
 import Data.String.Yarn (fromChars)
-import Prelude
-import Text.Parsing.StringParser (Parser, try)
+import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.CodeUnits (char, oneOf, satisfy)
 import Text.Parsing.StringParser.Combinators (many, many1, sepBy)
 
@@ -31,17 +34,17 @@ type Address =
 digits :: Parser (List Char)
 digits = many $ satisfy $ isDigit
 
+toString :: forall t1 t9. Functor t1 => Foldable t9 => t1 (t9 Char) -> t1 String
 toString = map (fromChars <<< A.fromFoldable)
 
 word :: Parser String
 word = toString <$> many1 $ satisfy $ \c -> isLetter c || isDigit c || c == '/'
 
--- parse a line that ends witha comma
 addressLine :: Parser String
 addressLine = toString <$> many1 $ satisfy (\c -> isLetter c || c == ' ' )
 
 poBox :: Parser String
-poBox = toString <$> many1 $ satisfy (\c -> isDigit c || isLetter c || c == ' ' )
+poBox = toString <$> many1 $ satisfy (\c -> isDigit c || isLetter c || c == ' ')
 
 postcode :: Parser String
 postcode = toString <$> many1 $ satisfy (\c -> isDigit c)
@@ -60,7 +63,7 @@ sepBySpace = toString <$> (many1 $ satisfy $ \c ->  c /= ',')   `sepBy` char ' '
 
 addressParserA2 :: Parser Address
 addressParserA2 = do
-    f      <- try word <|> try poBox
+    f      <- word
     skipWhitespaces 
     l1        <- addressLine 
     skipComma
@@ -80,7 +83,7 @@ addressParserA2 = do
 
 addressParserA3 :: Parser Address
 addressParserA3 = do
-    flat      <- try word <|> try poBox
+    flat      <- word
     skipWhitespaces 
     l1        <- addressLine 
     skipComma
@@ -103,7 +106,7 @@ addressParserA3 = do
 
 addressParserA4 :: Parser Address
 addressParserA4 = do
-    flat      <- try word <|> try poBox
+    flat      <- word
     skipWhitespaces 
     l1        <- addressLine 
     skipComma
@@ -127,17 +130,82 @@ addressParserA4 = do
         ,   postcode: p
         } 
 
+addressPostalParserA2 :: Parser Address
+addressPostalParserA2 = do
+    pb      <- poBox
+    skipComma
+    skipWhitespaces 
+    l4        <- addressLine
+    skipWhitespaces 
+    p        <- postcode
+    pure $
+        {
+            flatStreet: ""
+        ,   line1: pb
+        ,   line2: ""
+        ,   line3: ""
+        ,   line4: (trim l4)
+        ,   postcode: p
+        }
+
+addressPostalParserA3 :: Parser Address
+addressPostalParserA3 = do
+    pb      <- poBox
+    skipComma
+    skipWhitespaces 
+    l2        <- addressLine 
+    skipComma
+    skipWhitespaces
+    l4        <- addressLine
+    skipWhitespaces 
+    p        <- postcode
+    pure $
+        {
+            flatStreet: ""
+        ,   line1: pb
+        ,   line2: l2
+        ,   line3: ""
+        ,   line4: (trim l4)
+        ,   postcode: p
+        }
+
+addressPostalParserA4 :: Parser Address
+addressPostalParserA4 = do
+    pb      <- poBox
+    skipComma
+    skipWhitespaces 
+    l2        <- addressLine 
+    skipComma
+    skipWhitespaces
+    l3        <- addressLine 
+    skipComma
+    skipWhitespaces
+    l4        <- addressLine
+    skipWhitespaces 
+    p        <- postcode
+    pure $
+        {
+            flatStreet: ""
+        ,   line1: pb
+        ,   line2: l2
+        ,   line3: l3
+        ,   line4: (trim l4)
+        ,   postcode: p
+        }
+
 residentialParser :: Parser Address
 residentialParser = 
         try addressParserA2
     <|> try addressParserA3 
     <|> try addressParserA4
+    <|> try addressPostalParserA2
+    <|> try addressPostalParserA3
+    <|> try addressPostalParserA4
 
-i4 :: String
-i4 = "123 line, line, line, line 1234"
-
-i3 :: String
-i3 = "123 line, line, line 1234"
-
-i2 :: String
-i2 = "123 line, line  1234"
+get :: String -> Address
+get input = output 
+    where
+        result = runParser residentialParser input
+        output = either (\_ -> empty) id  $ result
+        empty = { flatStreet: "", line1: "", line2: "", line3: "", line4: "", postcode: "" }
+        id = \x -> x
