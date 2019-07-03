@@ -29,6 +29,10 @@ main = run [consoleReporter] do
             let input = "12/3A Long Street, Fantasy Suburb, Area, Wide City 1234"
             get input `shouldEqual` { flatStreet: "12/3A", line1: "Long Street", line2: "Fantasy Suburb", line3: "Area", line4: "Wide City", postcode: "1234" }        
 
+        it "rural with 3 lines" do
+            let input = "999A Long Road, RD 3, Kaikohe 6666"
+            get input `shouldEqual` { flatStreet: "999A", line1: "Long Road", line2: "RD 3", line3: "", line4: "Kaikohe", postcode: "6666" }        
+
     describe "Postal addresses tests" do
        
         it "with 2 lines" do

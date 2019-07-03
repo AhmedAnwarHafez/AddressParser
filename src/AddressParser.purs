@@ -41,7 +41,10 @@ word :: Parser String
 word = toString <$> many1 $ satisfy $ \c -> isLetter c || isDigit c || c == '/'
 
 addressLine :: Parser String
-addressLine = toString <$> many1 $ satisfy (\c -> isLetter c || c == ' ' )
+addressLine = toString <$> many1 $ satisfy (\c -> isLetter c || c == ' '  )
+
+ruralAddressLine :: Parser String
+ruralAddressLine = toString <$> many1 $ satisfy (\c -> isDigit c || isLetter c || c == ' '  )
 
 poBox :: Parser String
 poBox = toString <$> many1 $ satisfy (\c -> isDigit c || isLetter c || c == ' ')
@@ -88,7 +91,7 @@ addressParserA3 = do
     l1        <- addressLine 
     skipComma
     skipWhitespaces
-    l2        <- addressLine 
+    l2        <- try ruralAddressLine <|> try addressLine
     skipComma
     skipWhitespaces
     l4        <- addressLine
@@ -111,10 +114,10 @@ addressParserA4 = do
     l1        <- addressLine 
     skipComma
     skipWhitespaces
-    l2        <- addressLine 
+    l2        <- try ruralAddressLine <|> try addressLine 
     skipComma
     skipWhitespaces
-    l3       <- addressLine 
+    l3       <- try ruralAddressLine <|> try addressLine 
     skipComma
     skipWhitespaces
     l4        <- addressLine
@@ -153,7 +156,7 @@ addressPostalParserA3 = do
     pb      <- poBox
     skipComma
     skipWhitespaces 
-    l2        <- addressLine 
+    l2        <- try ruralAddressLine <|> try addressLine 
     skipComma
     skipWhitespaces
     l4        <- addressLine
@@ -174,10 +177,10 @@ addressPostalParserA4 = do
     pb      <- poBox
     skipComma
     skipWhitespaces 
-    l2        <- addressLine 
+    l2        <- try ruralAddressLine <|> try addressLine 
     skipComma
     skipWhitespaces
-    l3        <- addressLine 
+    l3        <- try ruralAddressLine <|> try addressLine 
     skipComma
     skipWhitespaces
     l4        <- addressLine
@@ -195,12 +198,12 @@ addressPostalParserA4 = do
 
 residentialParser :: Parser Address
 residentialParser = 
-        try addressParserA2
+        try addressParserA4
     <|> try addressParserA3 
-    <|> try addressParserA4
-    <|> try addressPostalParserA2
-    <|> try addressPostalParserA3
+    <|> try addressParserA2
     <|> try addressPostalParserA4
+    <|> try addressPostalParserA3
+    <|> try addressPostalParserA2
 
 get :: String -> Address
 get input = output 
